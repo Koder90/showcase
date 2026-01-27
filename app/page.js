@@ -12,11 +12,13 @@ import {
   Title,
   Anchor,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { showcases } from "../data/showcases";
 import { ShowcasePage } from "../components/showcase/ShowcasePage";
 
 export default function HomePage() {
   const [activeId, setActiveId] = useState(showcases[0]?.id);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const activeShowcase = useMemo(
     () => showcases.find((item) => item.id === activeId) ?? showcases[0],
     [activeId]
@@ -29,22 +31,22 @@ export default function HomePage() {
           display: "flex",
           flexDirection: "column",
           gap: 24,
-          padding: 24,
-          paddingBottom: 96,
+          padding: isMobile ? 16 : 24,
+          paddingBottom: isMobile ? 88 : 96,
           overflow: "hidden",
         }}
       >
       <Paper
         radius="lg"
-        px="xl"
-        py="md"
+        px={isMobile ? "md" : "xl"}
+        py={isMobile ? "sm" : "md"}
         withBorder
         shadow="md"
         style={{ alignSelf: "center" }}
       >
         <Stack align="center" gap={6} style={{ textAlign: "center" }}>
-          <Title order={1}>Širok spektar usluga</Title>
-          <Text size="lg" c="dimmed">
+          <Title order={isMobile ? 2 : 1}>Širok spektar usluga</Title>
+          <Text size={isMobile ? "md" : "lg"} c="dimmed">
             izaberite predložak prema želji i potrebi vašeg posla
           </Text>
         </Stack>
@@ -53,7 +55,7 @@ export default function HomePage() {
       <Box style={{ flex: 1, minHeight: 0 }}>
         <AppShell
           padding={0}
-          navbar={{ width: 260, breakpoint: "sm" }}
+          navbar={{ width: isMobile ? 200 : 260, breakpoint: "sm" }}
           styles={{
             main: {
               height: "100%",
@@ -68,11 +70,11 @@ export default function HomePage() {
         >
           <AppShell.Navbar p="md">
             <Stack gap="md">
-              <Paper radius="md" p="md" withBorder shadow="sm">
-                <Text fw={700} size="md">
+              <Paper radius="md" p={isMobile ? "sm" : "md"} withBorder shadow="sm">
+                <Text fw={700} size={isMobile ? "sm" : "md"}>
                   Showcase stranice
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size={isMobile ? "xs" : "sm"} c="dimmed">
                   Odaberite temu
                 </Text>
               </Paper>
@@ -84,6 +86,7 @@ export default function HomePage() {
                     active={showcase.id === activeId}
                     onClick={() => setActiveId(showcase.id)}
                     variant="light"
+                    style={{ fontSize: isMobile ? 12 : 14 }}
                   />
                 ))}
               </Stack>
@@ -92,7 +95,13 @@ export default function HomePage() {
 
           <AppShell.Main>
             <Box style={{ height: "100%", overflow: "hidden" }}>
-              <Box style={{ height: "100%", overflowY: "auto", paddingBottom: 120 }}>
+              <Box
+                style={{
+                  height: "100%",
+                  overflowY: "auto",
+                  paddingBottom: isMobile ? 140 : 120,
+                }}
+              >
                 {activeShowcase && <ShowcasePage showcase={activeShowcase} />}
               </Box>
             </Box>
@@ -110,13 +119,14 @@ export default function HomePage() {
         style={{
           position: "fixed",
           left: "50%",
-          bottom: 16,
+          bottom: 12,
           transform: "translateX(-50%)",
           zIndex: 5,
+          maxWidth: "calc(100vw - 32px)",
         }}
       >
         <Group justify="center">
-          <Text size="sm" fw={600}>
+          <Text size={isMobile ? "xs" : "sm"} fw={600}>
             designed by simple web -{" "}
             <Anchor
               href="https://simple-web-blue.vercel.app/"
