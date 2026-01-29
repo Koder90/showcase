@@ -7,6 +7,7 @@ import {
   Group,
   NavLink,
   Paper,
+  Select,
   Stack,
   Text,
   Title,
@@ -53,16 +54,64 @@ export default function HomePage() {
       </Paper>
 
       <Box style={{ flex: 1, minHeight: 0 }}>
-        {isMobile ? (
-          <Stack gap="md" style={{ height: "100%" }}>
-            <Paper radius="md" p="sm" withBorder shadow="sm">
-              <Text fw={700} size="sm">
+        <Stack gap="lg" style={{ height: "100%" }} hiddenFrom="sm">
+          <Paper radius="lg" p="md" withBorder shadow="sm">
+            <Stack align="center" gap="xs" style={{ textAlign: "center" }}>
+              <Text fw={700} size="md">
                 Showcase stranice
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="sm" c="dimmed">
                 Odaberite temu
               </Text>
-              <Group gap="xs" mt="sm" wrap="nowrap" style={{ overflowX: "auto" }}>
+            </Stack>
+            <Select
+              mt="md"
+              value={activeId}
+              onChange={(value) => setActiveId(value)}
+              data={showcases.map((showcase) => ({
+                value: showcase.id,
+                label: showcase.label,
+              }))}
+              placeholder="Odaberite showcase"
+              allowDeselect={false}
+              size="md"
+              radius="md"
+            />
+          </Paper>
+          <Box style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
+            <Box style={{ height: "100%", overflowY: "auto", paddingBottom: 140 }}>
+              {activeShowcase && <ShowcasePage showcase={activeShowcase} />}
+            </Box>
+          </Box>
+        </Stack>
+
+        <AppShell
+          padding={0}
+          navbar={{ width: 260, breakpoint: "sm" }}
+          styles={{
+            main: {
+              height: "100%",
+              background: "transparent",
+            },
+            navbar: {
+              height: "100%",
+              borderRight: "1px solid #dee2e6",
+            },
+          }}
+          style={{ height: "100%" }}
+          visibleFrom="sm"
+        >
+          <AppShell.Navbar p="md">
+            <Stack gap="md">
+              <Paper radius="md" p="md" withBorder shadow="sm">
+                <Text fw={700} size="md">
+                  Showcase stranice
+                </Text>
+                <Text size="sm" c="dimmed">
+                  Odaberite temu
+                </Text>
+              </Paper>
+              <Stack gap={6}>
                 {showcases.map((showcase) => (
                   <NavLink
                     key={showcase.id}
@@ -70,67 +119,21 @@ export default function HomePage() {
                     active={showcase.id === activeId}
                     onClick={() => setActiveId(showcase.id)}
                     variant="light"
-                    style={{ whiteSpace: "nowrap", fontSize: 12 }}
+                    style={{ fontSize: 14 }}
                   />
                 ))}
-              </Group>
-            </Paper>
-            <Box style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
-              <Box style={{ height: "100%", overflowY: "auto", paddingBottom: 140 }}>
+              </Stack>
+            </Stack>
+          </AppShell.Navbar>
+
+          <AppShell.Main>
+            <Box style={{ height: "100%", overflow: "hidden" }}>
+              <Box style={{ height: "100%", overflowY: "auto", paddingBottom: 120 }}>
                 {activeShowcase && <ShowcasePage showcase={activeShowcase} />}
               </Box>
             </Box>
-          </Stack>
-        ) : (
-          <AppShell
-            padding={0}
-            navbar={{ width: 260, breakpoint: "sm" }}
-            styles={{
-              main: {
-                height: "100%",
-                background: "transparent",
-              },
-              navbar: {
-                height: "100%",
-                borderRight: "1px solid #dee2e6",
-              },
-            }}
-            style={{ height: "100%" }}
-          >
-            <AppShell.Navbar p="md">
-              <Stack gap="md">
-                <Paper radius="md" p="md" withBorder shadow="sm">
-                  <Text fw={700} size="md">
-                    Showcase stranice
-                  </Text>
-                  <Text size="sm" c="dimmed">
-                    Odaberite temu
-                  </Text>
-                </Paper>
-                <Stack gap={6}>
-                  {showcases.map((showcase) => (
-                    <NavLink
-                      key={showcase.id}
-                      label={showcase.label}
-                      active={showcase.id === activeId}
-                      onClick={() => setActiveId(showcase.id)}
-                      variant="light"
-                      style={{ fontSize: 14 }}
-                    />
-                  ))}
-                </Stack>
-              </Stack>
-            </AppShell.Navbar>
-
-            <AppShell.Main>
-              <Box style={{ height: "100%", overflow: "hidden" }}>
-                <Box style={{ height: "100%", overflowY: "auto", paddingBottom: 120 }}>
-                  {activeShowcase && <ShowcasePage showcase={activeShowcase} />}
-                </Box>
-              </Box>
-            </AppShell.Main>
-          </AppShell>
-        )}
+          </AppShell.Main>
+        </AppShell>
       </Box>
 
       <Paper

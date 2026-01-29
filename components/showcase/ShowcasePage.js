@@ -1,8 +1,11 @@
+import Image from "next/image";
 import {
   Anchor,
   Badge,
   Box,
   Button,
+  Burger,
+  Collapse,
   Divider,
   Group,
   MantineProvider,
@@ -15,13 +18,19 @@ import {
   Title,
   ThemeIcon,
 } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 
-function SectionContainer({ layout, children, fullWidth }) {
+function SectionContainer({ layout, children, fullWidth, isMobile }) {
+  const sectionPadding = isMobile
+    ? Math.max(24, Math.round(layout.sectionPadding * 0.5))
+    : layout.sectionPadding;
+  const contentWidth = isMobile ? Math.min(layout.contentWidth, 520) : layout.contentWidth;
+
   return (
     <Box
-      px={layout.sectionPadding}
+      px={sectionPadding}
       style={{
-        maxWidth: fullWidth ? "100%" : layout.contentWidth,
+        maxWidth: fullWidth ? "100%" : contentWidth,
         margin: "0 auto",
       }}
     >
@@ -30,14 +39,15 @@ function SectionContainer({ layout, children, fullWidth }) {
   );
 }
 
-function SectionHeading({ children, layout, order = 2 }) {
+function SectionHeading({ children, layout, order = 2, isMobile }) {
   return (
     <Title
-      order={order}
+      order={isMobile ? Math.max(3, order) : order}
       tt={layout.headingCaps ? "uppercase" : "none"}
       fw={layout.headingWeight}
       style={{
         letterSpacing: layout.headingLetterSpacing,
+        textAlign: isMobile ? "center" : "left",
       }}
     >
       {children}
@@ -45,10 +55,17 @@ function SectionHeading({ children, layout, order = 2 }) {
   );
 }
 
-function ShowcaseHeader({ palette, layout, content }) {
+function ShowcaseHeader({ palette, layout, content, isMobile }) {
+  const [opened, { toggle }] = useDisclosure(false);
+  const navTargets = {
+    "O nama": "about",
+    Cjenik: "pricing",
+    "Kontaktiraj nas": "contact",
+  };
+
   return (
     <Box
-      px={layout.sectionPadding}
+      px={isMobile ? 20 : layout.sectionPadding}
       py={24}
       style={{
         position: layout.headerSticky ? "sticky" : "relative",
@@ -65,7 +82,7 @@ function ShowcaseHeader({ palette, layout, content }) {
             tt={layout.taglineCaps ? "uppercase" : "none"}
             fw={600}
             c={palette.muted}
-            size="xs"
+            size={isMobile ? "sm" : "xs"}
             style={{ letterSpacing: layout.taglineLetterSpacing }}
           >
             {content.tagline}
@@ -74,30 +91,69 @@ function ShowcaseHeader({ palette, layout, content }) {
             Showcase Studio
           </Title>
         </Stack>
-        <Group gap="lg">
-          {content.nav.map((item) => (
-            <Anchor
-              key={item}
-              href="#"
-              underline="never"
-              c={palette.text}
-              fw={500}
-              onClick={(event) => event.preventDefault()}
-            >
-              {item}
-            </Anchor>
-          ))}
-        </Group>
+        {isMobile ? (
+          <Burger opened={opened} onClick={toggle} size="sm" aria-label="Toggle navigation" />
+        ) : (
+          <Group gap="lg">
+            {content.nav.map((item) => (
+              <Anchor
+                key={item}
+                href={navTargets[item] ? `#${navTargets[item]}` : "#"}
+                underline="never"
+                c={palette.text}
+                fw={500}
+              >
+                {item}
+              </Anchor>
+            ))}
+          </Group>
+        )}
       </Group>
+      {isMobile && (
+        <Collapse in={opened}>
+          <Stack mt="md" gap="sm" align="center">
+            {content.nav.map((item) => (
+              <Anchor
+                key={item}
+                href={navTargets[item] ? `#${navTargets[item]}` : "#"}
+                underline="never"
+                c={palette.text}
+                fw={600}
+                size="md"
+              >
+                {item}
+              </Anchor>
+            ))}
+          </Stack>
+        </Collapse>
+      )}
     </Box>
   );
 }
 
-function ImagePlaceholder({ palette, layout }) {
+function ImagePlaceholder({
+  palette,
+  layout,
+  imageSrc,
+  imageAlt,
+  imageWidth,
+  imageHeight,
+  isMobile,
+}) {
+  const maxWidth = imageWidth ?? layout.placeholderWidth ?? layout.contentWidth;
+  const maxHeight = imageHeight ?? layout.placeholderHeight;
+  const sizes = imageWidth ? `${imageWidth}px` : "(max-width: 768px) 90vw, 50vw";
+  const containerWidth = imageWidth ?? "100%";
+  const containerHeight = imageHeight ?? layout.placeholderHeight;
+
   return (
     <Box
       style={{
-        height: layout.placeholderHeight,
+        width: containerWidth,
+        height: containerHeight,
+        maxWidth: isMobile ? "100%" : maxWidth,
+        maxHeight: isMobile ? Math.min(containerHeight, 260) : maxHeight,
+        margin: "0 auto",
         borderRadius: layout.imageRadius,
         border: `1px solid ${palette.border}`,
         background: layout.placeholderGradient || palette.heroGradient,
@@ -106,36 +162,80 @@ function ImagePlaceholder({ palette, layout }) {
         overflow: "hidden",
       }}
     >
-      <Box
-        style={{
-          position: "absolute",
-          inset: "12%",
-          borderRadius: layout.imageRadius,
-          border: `1px dashed ${palette.accentSoft}`,
-          opacity: 0.8,
-        }}
-      />
+      {imageSrc ? (
+        <Box
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 12,
+          }}
+        >
+          <Box
+            style={{
+              width: "100%",
+              height: "100%",
+              maxWidth: isMobile ? "100%" : maxWidth,
+              maxHeight: isMobile ? "100%" : maxHeight,
+              position: "relative",
+            }}
+          >
+            <Image
+              src={imageSrc}
+              alt={imageAlt}
+              width={imageWidth || 800}
+              height={imageHeight || 600}
+              sizes={sizes}
+              style={{
+                width: "100%",
+                height: "100%",
+                maxWidth: imageWidth,
+                maxHeight: imageHeight,
+                objectFit: "cover",
+              }}
+            />
+          </Box>
+        </Box>
+      ) : (
+        <Box
+          style={{
+            position: "absolute",
+            inset: "12%",
+            borderRadius: layout.imageRadius,
+            border: `1px dashed ${palette.accentSoft}`,
+            opacity: 0.8,
+          }}
+        />
+      )}
     </Box>
   );
 }
 
-function HeroSection({ palette, layout, content }) {
-  const heroTitleSize = layout.heroTitleSize;
+function HeroSection({ palette, layout, content, isMobile }) {
+  const heroTitleSize = isMobile ? Math.min(layout.heroTitleSize, 36) : layout.heroTitleSize;
   const heroLayout = layout.heroLayout;
   const heroBackground = heroLayout === "full" ? palette.heroGradient : "transparent";
 
   return (
     <Box
-      py={layout.heroPadding}
+      py={isMobile ? Math.max(32, Math.round(layout.heroPadding * 0.6)) : layout.heroPadding}
       style={{
         background: heroBackground,
         borderTop: layout.heroBorder ? `1px solid ${palette.border}` : "none",
         borderBottom: layout.heroBorder ? `1px solid ${palette.border}` : "none",
       }}
     >
-      <SectionContainer layout={layout} fullWidth={heroLayout === "full"}>
+      <SectionContainer layout={layout} fullWidth={heroLayout === "full"} isMobile={isMobile}>
         {heroLayout === "centered" && (
-          <Stack gap={24} align="center" ta="center" maw={720} mx="auto">
+          <Stack
+            gap={isMobile ? 18 : 24}
+            align="center"
+            ta="center"
+            maw={720}
+            mx="auto"
+          >
             {layout.showHeroBadge && (
               <Badge color="brand" variant="light" size="lg">
                 {content.tagline}
@@ -152,7 +252,7 @@ function HeroSection({ palette, layout, content }) {
             >
               {content.heroTitle}
             </Title>
-            <Text c={palette.muted} size={layout.heroTextSize}>
+            <Text c={palette.muted} size={isMobile ? "md" : layout.heroTextSize}>
               {content.heroText}
             </Text>
             <Group>
@@ -161,21 +261,38 @@ function HeroSection({ palette, layout, content }) {
                 size="md"
                 radius={layout.buttonRadius}
                 variant={layout.buttonVariant}
+                fullWidth={isMobile}
               >
                 {content.heroCta}
               </Button>
               {layout.showSecondaryCta && (
-                <Button variant={layout.secondaryButtonVariant} size="md" radius={layout.buttonRadius}>
+                <Button
+                  variant={layout.secondaryButtonVariant}
+                  size="md"
+                  radius={layout.buttonRadius}
+                  fullWidth={isMobile}
+                >
                   Pogledaj detalje
                 </Button>
               )}
             </Group>
+            {layout.showPlaceholder && content.image && (
+              <ImagePlaceholder
+                palette={palette}
+                layout={layout}
+                imageSrc={content.image}
+                imageAlt={content.imageAlt || content.heroTitle}
+                imageWidth={content.imageWidth}
+                imageHeight={content.imageHeight}
+                isMobile={isMobile}
+              />
+            )}
           </Stack>
         )}
 
         {heroLayout === "split" && (
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-            <Stack gap={20} maw={640}>
+            <Stack gap={20} maw={640} align={isMobile ? "center" : "stretch"} ta={isMobile ? "center" : "left"}>
               {layout.showHeroBadge && (
                 <Badge color="brand" variant="light" size="lg">
                   {content.tagline}
@@ -192,31 +309,47 @@ function HeroSection({ palette, layout, content }) {
               >
                 {content.heroTitle}
               </Title>
-              <Text c={palette.muted} size={layout.heroTextSize}>
+              <Text c={palette.muted} size={isMobile ? "md" : layout.heroTextSize}>
                 {content.heroText}
               </Text>
-              <Group>
+              <Group justify={isMobile ? "center" : "flex-start"}>
                 <Button
                   color="brand"
                   size="md"
                   radius={layout.buttonRadius}
                   variant={layout.buttonVariant}
+                  fullWidth={isMobile}
                 >
                   {content.heroCta}
                 </Button>
                 {layout.showSecondaryCta && (
-                  <Button variant={layout.secondaryButtonVariant} size="md" radius={layout.buttonRadius}>
+                  <Button
+                    variant={layout.secondaryButtonVariant}
+                    size="md"
+                    radius={layout.buttonRadius}
+                    fullWidth={isMobile}
+                  >
                     Pogledaj detalje
                   </Button>
                 )}
               </Group>
             </Stack>
-            {layout.showPlaceholder && <ImagePlaceholder palette={palette} layout={layout} />}
+            {layout.showPlaceholder && (
+              <ImagePlaceholder
+                palette={palette}
+                layout={layout}
+                imageSrc={content.image}
+                imageAlt={content.imageAlt || content.heroTitle}
+                imageWidth={content.imageWidth}
+                imageHeight={content.imageHeight}
+                isMobile={isMobile}
+              />
+            )}
           </SimpleGrid>
         )}
 
         {heroLayout === "full" && (
-          <Stack gap={28} maw={740}>
+          <Stack gap={28} maw={740} align={isMobile ? "center" : "stretch"} ta={isMobile ? "center" : "left"}>
             {layout.showHeroBadge && (
               <Badge color="brand" variant="light" size="lg">
                 {content.tagline}
@@ -233,25 +366,41 @@ function HeroSection({ palette, layout, content }) {
             >
               {content.heroTitle}
             </Title>
-            <Text c={palette.muted} size={layout.heroTextSize}>
+            <Text c={palette.muted} size={isMobile ? "md" : layout.heroTextSize}>
               {content.heroText}
             </Text>
-            <Group>
+            <Group justify={isMobile ? "center" : "flex-start"}>
               <Button
                 color="brand"
                 size="md"
                 radius={layout.buttonRadius}
                 variant={layout.buttonVariant}
+                fullWidth={isMobile}
               >
                 {content.heroCta}
               </Button>
               {layout.showSecondaryCta && (
-                <Button variant={layout.secondaryButtonVariant} size="md" radius={layout.buttonRadius}>
+                <Button
+                  variant={layout.secondaryButtonVariant}
+                  size="md"
+                  radius={layout.buttonRadius}
+                  fullWidth={isMobile}
+                >
                   Pogledaj detalje
                 </Button>
               )}
             </Group>
-            {layout.showPlaceholder && <ImagePlaceholder palette={palette} layout={layout} />}
+            {layout.showPlaceholder && (
+              <ImagePlaceholder
+                palette={palette}
+                layout={layout}
+                imageSrc={content.image}
+                imageAlt={content.imageAlt || content.heroTitle}
+                imageWidth={content.imageWidth}
+                imageHeight={content.imageHeight}
+                isMobile={isMobile}
+              />
+            )}
           </Stack>
         )}
       </SectionContainer>
@@ -259,24 +408,27 @@ function HeroSection({ palette, layout, content }) {
   );
 }
 
-function FeaturesSection({ palette, layout, content }) {
+function FeaturesSection({ palette, layout, content, isMobile }) {
   if (!content.features || content.features.length === 0) return null;
   const isList = layout.featuresLayout === "list";
 
   return (
     <Box
+      id="features"
       py={layout.sectionPadding}
       style={{
         background: layout.sectionBackgrounds.includes("features") ? palette.surfaceAlt : "transparent",
       }}
     >
-      <SectionContainer layout={layout}>
+      <SectionContainer layout={layout} isMobile={isMobile}>
         <Stack gap={layout.sectionGap}>
-          <SectionHeading layout={layout}>{content.featuresTitle}</SectionHeading>
+          <SectionHeading layout={layout} isMobile={isMobile}>
+            {content.featuresTitle}
+          </SectionHeading>
           {isList ? (
             <Stack gap="md">
               {content.features.map((feature) => (
-                <Group key={feature.title} align="flex-start" gap="md">
+                <Group key={feature.title} align="flex-start" gap="md" justify={isMobile ? "center" : "flex-start"}>
                   {layout.featuresWithIcons && (
                     <ThemeIcon variant="light" color="brand" radius={layout.buttonRadius}>
                       <Text fw={700} size="sm">
@@ -285,7 +437,9 @@ function FeaturesSection({ palette, layout, content }) {
                     </ThemeIcon>
                   )}
                   <Box>
-                    <Text fw={600}>{feature.title}</Text>
+                    <Text fw={600} ta={isMobile ? "center" : "left"}>
+                      {feature.title}
+                    </Text>
                     <Text size="sm" c={palette.muted}>
                       {feature.description}
                     </Text>
@@ -329,19 +483,22 @@ function FeaturesSection({ palette, layout, content }) {
   );
 }
 
-function AboutSection({ palette, layout, content }) {
+function AboutSection({ palette, layout, content, isMobile }) {
   if (layout.aboutLayout === "library") {
     return (
       <Box
+        id="about"
         py={layout.sectionPadding}
         style={{
           background: layout.sectionBackgrounds.includes("about") ? palette.surfaceAlt : "transparent",
         }}
       >
-        <SectionContainer layout={layout} fullWidth>
+        <SectionContainer layout={layout} fullWidth isMobile={isMobile}>
           <Stack gap={layout.sectionGap}>
-            <SectionHeading layout={layout}>{content.aboutTitle}</SectionHeading>
-            <Text size="lg" c={palette.muted} maw={800}>
+            <SectionHeading layout={layout} isMobile={isMobile}>
+              {content.aboutTitle}
+            </SectionHeading>
+            <Text size={isMobile ? "md" : "lg"} c={palette.muted} maw={800} ta={isMobile ? "center" : "left"}>
               {content.aboutText}
             </Text>
             <SimpleGrid cols={{ base: 1, md: 4 }} spacing="xl">
@@ -392,15 +549,18 @@ function AboutSection({ palette, layout, content }) {
 
   return (
     <Box
+      id="about"
       py={layout.sectionPadding}
       style={{
         background: layout.sectionBackgrounds.includes("about") ? palette.surfaceAlt : "transparent",
       }}
     >
-      <SectionContainer layout={layout}>
+      <SectionContainer layout={layout} isMobile={isMobile}>
         <Stack gap={layout.sectionGap}>
-          <SectionHeading layout={layout}>{content.aboutTitle}</SectionHeading>
-          <Text size="lg" c={palette.muted} maw={720}>
+          <SectionHeading layout={layout} isMobile={isMobile}>
+            {content.aboutTitle}
+          </SectionHeading>
+          <Text size={isMobile ? "md" : "lg"} c={palette.muted} maw={720} ta={isMobile ? "center" : "left"}>
             {content.aboutText}
           </Text>
           {layout.aboutLayout === "split" && (
@@ -413,7 +573,9 @@ function AboutSection({ palette, layout, content }) {
                         ✓
                       </Text>
                     </ThemeIcon>
-                    <Text fw={600}>{item}</Text>
+                    <Text fw={600} ta={isMobile ? "center" : "left"}>
+                      {item}
+                    </Text>
                   </Group>
                 ))}
               </Stack>
@@ -437,7 +599,7 @@ function AboutSection({ palette, layout, content }) {
           {layout.aboutLayout === "plain" && (
             <Stack gap="sm">
               {content.aboutHighlights.map((item) => (
-                <Text key={item} fw={500} c={palette.muted}>
+                <Text key={item} fw={500} c={palette.muted} ta={isMobile ? "center" : "left"}>
                   {item}
                 </Text>
               ))}
@@ -456,7 +618,9 @@ function AboutSection({ palette, layout, content }) {
                     boxShadow: layout.cardShadow,
                   }}
                 >
-                  <Text fw={600}>{item}</Text>
+                  <Text fw={600} ta={isMobile ? "center" : "left"}>
+                    {item}
+                  </Text>
                   <Text size="sm" c={palette.muted} mt="xs">
                     {content.aboutSupportText}
                   </Text>
@@ -470,17 +634,20 @@ function AboutSection({ palette, layout, content }) {
   );
 }
 
-function PricingSection({ palette, layout, content }) {
+function PricingSection({ palette, layout, content, isMobile }) {
   return (
     <Box
-      py={layout.sectionPadding}
+      id="pricing"
+      py={isMobile ? Math.max(24, Math.round(layout.sectionPadding * 0.5)) : layout.sectionPadding}
       style={{
         background: layout.sectionBackgrounds.includes("pricing") ? palette.surfaceAlt : "transparent",
       }}
     >
-      <SectionContainer layout={layout}>
+      <SectionContainer layout={layout} isMobile={isMobile}>
         <Stack gap={layout.sectionGap}>
-          <SectionHeading layout={layout}>{content.pricingTitle}</SectionHeading>
+          <SectionHeading layout={layout} isMobile={isMobile}>
+            {content.pricingTitle}
+          </SectionHeading>
           {layout.pricingLayout === "cards" && (
             <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
               {content.pricingPlans.map((plan) => (
@@ -495,7 +662,9 @@ function PricingSection({ palette, layout, content }) {
                   }}
                 >
                   <Stack gap="xs">
-                    <Text fw={700}>{plan.name}</Text>
+                    <Text fw={700} ta={isMobile ? "center" : "left"}>
+                      {plan.name}
+                    </Text>
                     <Title order={3} c={palette.accent}>
                       {plan.price}
                     </Title>
@@ -507,6 +676,7 @@ function PricingSection({ palette, layout, content }) {
                       color="brand"
                       radius={layout.buttonRadius}
                       mt="sm"
+                      fullWidth={isMobile}
                     >
                       Odaberi paket
                     </Button>
@@ -568,22 +738,25 @@ function PricingSection({ palette, layout, content }) {
   );
 }
 
-function ContactSection({ palette, layout, content }) {
+function ContactSection({ palette, layout, content, isMobile }) {
   return (
     <Box
-      py={layout.sectionPadding}
+      id="contact"
+      py={isMobile ? Math.max(24, Math.round(layout.sectionPadding * 0.5)) : layout.sectionPadding}
       style={{
         background: layout.sectionBackgrounds.includes("contact") ? palette.surfaceAlt : "transparent",
       }}
     >
-      <SectionContainer layout={layout}>
+      <SectionContainer layout={layout} isMobile={isMobile}>
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-          <Stack gap="md">
-            <SectionHeading layout={layout}>{content.contactTitle}</SectionHeading>
-            <Text size="lg" c={palette.muted}>
+          <Stack gap="md" align={isMobile ? "center" : "stretch"}>
+            <SectionHeading layout={layout} isMobile={isMobile}>
+              {content.contactTitle}
+            </SectionHeading>
+            <Text size={isMobile ? "md" : "lg"} c={palette.muted} ta={isMobile ? "center" : "left"}>
               {content.contactText}
             </Text>
-            <Text size="sm" c={palette.muted}>
+            <Text size="sm" c={palette.muted} ta={isMobile ? "center" : "left"}>
               Ovaj obrazac je demonstracijski i ne šalje podatke.
             </Text>
           </Stack>
@@ -594,11 +767,16 @@ function ContactSection({ palette, layout, content }) {
               bg={palette.surface}
               style={{ border: `1px solid ${palette.border}`, boxShadow: layout.cardShadow }}
             >
-              <Stack>
+              <Stack gap={isMobile ? "md" : "sm"}>
                 <TextInput label="Ime" placeholder="Vaše ime" />
                 <TextInput label="Email" placeholder="ime@domena.com" />
                 <Textarea label="Poruka" placeholder="Opišite svoj događaj..." minRows={4} />
-                <Button color="brand" variant={layout.buttonVariant} radius={layout.buttonRadius}>
+                <Button
+                  color="brand"
+                  variant={layout.buttonVariant}
+                  radius={layout.buttonRadius}
+                  fullWidth={isMobile}
+                >
                   Pošalji upit
                 </Button>
               </Stack>
@@ -610,8 +788,13 @@ function ContactSection({ palette, layout, content }) {
                 <TextInput label="Email" placeholder="ime@domena.com" />
               </SimpleGrid>
               <Textarea label="Poruka" placeholder="Opišite svoj događaj..." minRows={4} />
-              <Group justify="flex-start">
-                <Button color="brand" variant={layout.buttonVariant} radius={layout.buttonRadius}>
+              <Group justify={isMobile ? "center" : "flex-start"}>
+                <Button
+                  color="brand"
+                  variant={layout.buttonVariant}
+                  radius={layout.buttonRadius}
+                  fullWidth={isMobile}
+                >
                   Pošalji upit
                 </Button>
               </Group>
@@ -626,6 +809,7 @@ function ContactSection({ palette, layout, content }) {
 export function ShowcasePage({ showcase }) {
   const { theme, palette, content, layout } = showcase;
   const sectionOrder = layout.sectionOrder;
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <MantineProvider theme={theme}>
@@ -636,19 +820,53 @@ export function ShowcasePage({ showcase }) {
           color: palette.text,
         }}
       >
-        <ShowcaseHeader palette={palette} layout={layout} content={content} />
+        <ShowcaseHeader palette={palette} layout={layout} content={content} isMobile={isMobile} />
         {sectionOrder.map((section, index) => {
           const sectionMap = {
-            hero: <HeroSection key="hero" palette={palette} layout={layout} content={content} />,
-            features: (
-              <FeaturesSection key="features" palette={palette} layout={layout} content={content} />
+            hero: (
+              <HeroSection
+                key="hero"
+                palette={palette}
+                layout={layout}
+                content={content}
+                isMobile={isMobile}
+              />
             ),
-            about: <AboutSection key="about" palette={palette} layout={layout} content={content} />,
+            features: (
+              <FeaturesSection
+                key="features"
+                palette={palette}
+                layout={layout}
+                content={content}
+                isMobile={isMobile}
+              />
+            ),
+            about: (
+              <AboutSection
+                key="about"
+                palette={palette}
+                layout={layout}
+                content={content}
+                isMobile={isMobile}
+              />
+            ),
             pricing: (
-              <PricingSection key="pricing" palette={palette} layout={layout} content={content} />
+              <PricingSection
+                key="pricing"
+                palette={palette}
+                layout={layout}
+                content={content}
+                isMobile={isMobile}
+              />
             ),
             contact: (
-              <ContactSection key="contact" palette={palette} layout={layout} content={content} />
+              <ContactSection
+                key="contact"
+                palette={palette}
+                layout={layout}
+                content={content}
+                isMobile={isMobile}
+              />
             ),
           };
 
