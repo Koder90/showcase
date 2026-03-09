@@ -1,6 +1,12 @@
 import "@mantine/core/styles.css";
 import "./globals.css";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ColorSchemeScript, MantineProvider, createTheme } from "@mantine/core";
+import { SidebarLayout } from "../components/SidebarLayout";
+
+const theme = createTheme({
+  primaryColor: "blue",
+  defaultRadius: "md",
+});
 
 export const metadata = {
   title: "Showcase predlošci",
@@ -14,7 +20,9 @@ export default function RootLayout({ children }) {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider theme={theme} defaultColorScheme="dark">
+          <SidebarLayout>{children}</SidebarLayout>
+        </MantineProvider>
       </body>
     </html>
   );

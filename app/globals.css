@@ -4,18 +4,100 @@
   box-sizing: border-box;
 }
 
+:root {
+  --site-bg-start: #0f172a;
+  --site-bg-mid: #1e293b;
+  --site-bg-end: #0c4a6e;
+  --accent-blue: #0ea5e9;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #22d3ee;
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 20px 40px -12px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.2);
+}
+
 html,
 body {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  background: #f5f6f7;
-  color: #111;
+  background: linear-gradient(160deg, var(--site-bg-start) 0%, var(--site-bg-mid) 45%, var(--site-bg-end) 100%);
+  background-attachment: fixed;
+  color: #f1f5f9;
+}
+
+/* Subtle noise overlay for depth */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Glass panel utility */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Showcase card – 3D lift and glow on hover */
+.showcase-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.showcase-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-lift), 0 0 30px rgba(14, 165, 233, 0.15);
+}
+
+/* Section card hover lift */
+.section-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.section-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Sidebar showcase button hover */
+.sidebar-showcase-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.sidebar-showcase-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.1);
+}
+
+/* Header nav link hover */
+.nav-link:hover {
+  color: #22d3ee !important;
+}
+
+/* Mobile menu slide */
+@keyframes mobileMenuSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.mobile-menu-panel {
+  animation: mobileMenuSlide 0.25s ease;
 }
