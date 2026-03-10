@@ -15,9 +15,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="hr">
+    <html lang="hr" suppressHydrationWarning>
       <head>
-        <ColorSchemeScript />
+        <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="dark">

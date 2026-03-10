@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Box, Group, Button, Text, Burger, Stack } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Box, Group, Button, Text, Burger } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 
 const NAV_ITEMS = [
@@ -15,8 +12,7 @@ const NAV_ITEMS = [
   { href: "/#kontakt", label: "Kontakt" },
 ];
 
-export function SiteHeader() {
-  const [opened, { toggle }] = useDisclosure(false);
+export function SiteHeader({ mobileMenuOpened, onMobileMenuToggle }) {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
@@ -58,55 +54,15 @@ export function SiteHeader() {
             </Button>
           </Group>
         ) : (
-          <Burger opened={opened} onClick={toggle} color="white" size="sm" aria-label="Meni" />
+          <Burger
+            opened={mobileMenuOpened ?? false}
+            onClick={onMobileMenuToggle ?? (() => {})}
+            color="white"
+            size="sm"
+            aria-label="Meni"
+          />
         )}
       </Group>
-
-      {/* Mobile full-screen menu */}
-      {isMobile && (
-        <Box
-          className={opened ? "mobile-menu-panel" : undefined}
-        style={{
-            position: "fixed",
-            inset: 0,
-            top: 56,
-            zIndex: 99,
-            background: "rgba(15, 23, 42, 0.97)",
-            backdropFilter: "blur(12px)",
-            display: opened ? "block" : "none",
-            padding: "24px 20px",
-            overflow: "auto",
-          }}
-        >
-          <Stack gap="md" pt="xl">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => toggle.close()}
-                style={{ display: "block", minHeight: 44 }}
-              >
-                <Text size="lg" fw={500} c="white" py="sm">
-                  {item.label}
-                </Text>
-              </Link>
-            ))}
-            <Button
-              component={Link}
-              href="/#kontakt"
-              onClick={() => toggle.close()}
-              variant="gradient"
-              gradient={{ from: "blue.6", to: "cyan.5" }}
-              size="md"
-              radius="xl"
-              fullWidth
-              style={{ minHeight: 48 }}
-            >
-              Zatraži ponudu
-            </Button>
-          </Stack>
-        </Box>
-      )}
     </Box>
   );
 }
