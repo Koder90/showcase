@@ -53,7 +53,7 @@ export function ContactForm({ showcaseOptions }) {
             Zatražite web stranicu
           </Title>
           <Text size="sm" c="gray.4" ta="center" mt={4}>
-            Simple Web – pošaljite upit i javit ćemo vam se.
+            Showcase Studio – pošaljite upit i javit ćemo vam se.
           </Text>
         </div>
 

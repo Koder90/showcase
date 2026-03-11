@@ -62,7 +62,7 @@ export default function HomePage() {
         >
           <Group justify="center">
             <Text size={isMobile ? "xs" : "sm"} fw={600} c="gray.3">
-              designed by simple web –{" "}
+              designed by Showcase Studio –{" "}
               <Anchor
                 href="https://simple-web-blue.vercel.app/"
                 target="_blank"

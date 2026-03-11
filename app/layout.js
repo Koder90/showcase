@@ -9,7 +9,7 @@ const theme = createTheme({
 });
 
 export const metadata = {
-  title: "Showcase predlošci",
+  title: "Showcase Studio",
   description: "One-page showcase predložaka za različite industrije.",
 };
 

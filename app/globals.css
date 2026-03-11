@@ -101,3 +101,42 @@ a {
 .mobile-menu-panel {
   animation: mobileMenuSlide 0.25s ease;
 }
+
+/* Mobile horizontal swipe sections (max-width: 768px) */
+@media (max-width: 768px) {
+  .mobile-swipe-container {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 16px;
+    padding: 8px 16px 24px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .mobile-swipe-container::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-swipe-card {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+  .mobile-swipe-hint {
+    text-align: center;
+    padding: 8px 0 0;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .mobile-swipe-hint-arrow {
+    display: inline-block;
+    margin-left: 4px;
+    animation: swipeHintBounce 1.5s ease-in-out infinite;
+  }
+}
+@keyframes swipeHintBounce {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}

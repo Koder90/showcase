@@ -29,7 +29,7 @@ export function SiteHeader({ mobileMenuOpened, onMobileMenuToggle }) {
       <Group justify="space-between" px={{ base: "md", sm: "xl" }} py="sm" maw={1400} mx="auto">
         <Link href="/" style={{ display: "flex", alignItems: "center" }}>
           <Text fw={700} size="lg" c="white">
-            Simple Web
+            Showcase Studio
           </Text>
         </Link>
 
