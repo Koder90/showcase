@@ -13,6 +13,7 @@ import {
   IconBeer,
   IconBook,
   IconBuilding,
+  IconCar,
   IconChevronDown,
   IconChevronRight,
 } from "@tabler/icons-react";
@@ -43,6 +44,10 @@ const SHOWCASE_STYLES = {
   poslovna: {
     gradient: "linear-gradient(135deg, #1e3a8a 0%, #64748b 100%)",
     Icon: IconBuilding,
+  },
+  rentacar: {
+    gradient: "linear-gradient(135deg, #0b2a5b 0%, #06b6d4 100%)",
+    Icon: IconCar,
   },
 };
 

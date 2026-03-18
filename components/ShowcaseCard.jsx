@@ -12,6 +12,7 @@ const SHORT_DESCRIPTIONS = {
   "irish-pub": "Atmosferski stil za pubove i barove.",
   knjiznica: "Čist i pregledan dizajn za edukaciju i sadržaj.",
   poslovna: "Profesionalna stranica za tvrtke i osobni branding.",
+  rentacar: "Moderan i praktičan web dizajn za iznajmljivanje vozila.",
 };
 
 const MAX_TILT = 6;
